@@ -1,3 +1,5 @@
+using System.Reflection;
+using Carter;
 using VerticalSliceAPI.Extensions;
 using VerticalSliceAPI.Model;
 
@@ -9,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>();
+builder.Services.AddCarter();
 
 var app = builder.Build();
 
@@ -17,10 +20,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.ApplyMigrations();
+    //app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.MapCarter();
 
 app.Run();

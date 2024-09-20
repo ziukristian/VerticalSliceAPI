@@ -6,23 +6,17 @@ using VerticalSliceAPI.Model;
 
 namespace VerticalSliceAPI.Features.Users
 {
-    public class CreateUser { }
+    public class GetAllUsers { }
 
-    public class Endpoint : ICarterModule
+    public class GetAllUsersEndpoint : ICarterModule
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost(
+            app.MapGet(
                 "users",
                 async (AppDbContext context) =>
                 {
-                    User user = new() { Email = "ziukristian@gmail.com", Password = "123" };
-
-                    await context.AddAsync(user);
-
-                    await context.SaveChangesAsync();
-
-                    return Results.Ok(user.Id);
+                    return Results.Ok(await context.Users.ToListAsync());
                 }
             );
         }
