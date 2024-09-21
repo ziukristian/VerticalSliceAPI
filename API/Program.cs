@@ -1,5 +1,6 @@
 using System.Reflection;
 using Carter;
+using Microsoft.AspNetCore.Hosting;
 using Serilog;
 using VerticalSliceAPI.Extensions;
 using VerticalSliceAPI.Model;
@@ -26,6 +27,7 @@ builder.Services.AddStackExchangeRedisOutputCache(options =>
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
     options.InstanceName = "vertical-slice-api";
 });
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 var app = builder.Build();
 
