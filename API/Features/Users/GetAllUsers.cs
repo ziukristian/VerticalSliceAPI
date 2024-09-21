@@ -13,12 +13,16 @@ namespace VerticalSliceAPI.Features.Users
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             app.MapGet(
-                "users",
-                async (AppDbContext context) =>
-                {
-                    return Results.Ok(await context.Users.ToListAsync());
-                }
-            );
+                    "users",
+                    async (AppDbContext context) =>
+                    {
+                        return Results.Ok(await context.Users.ToListAsync());
+                    }
+                )
+                .WithTags(UserShared.Tag)
+                .CacheOutput(builder =>
+                    builder.Expire(TimeSpan.FromMinutes(10)).Tag(UserShared.Tag)
+                );
         }
     }
 }

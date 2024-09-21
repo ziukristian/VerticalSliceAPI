@@ -17,6 +17,15 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>();
 builder.Services.AddCarter();
+builder.Services.AddOutputCache(options =>
+{
+    options.AddBasePolicy(b => b.Tag("all"), true);
+});
+builder.Services.AddStackExchangeRedisOutputCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "vertical-slice-api";
+});
 
 var app = builder.Build();
 
@@ -39,5 +48,6 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.MapCarter();
+app.UseOutputCache();
 
 app.Run();

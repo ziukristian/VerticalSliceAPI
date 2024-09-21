@@ -2,15 +2,31 @@ version: '3.4'
 
 services:
   verticalsliceapi:
-    image: ${DOCKER_REGISTRY-}verticalsliceapi
+    image: ${DOCKER_REGISTRY:-}verticalsliceapi
     build:
       context: API
       dockerfile: Dockerfile
-  logger:
+    networks:
+      - app-network  # Add to network
+
+  seq:
     image: datalust/seq:latest
     ports:
-      - "5341:5341"
-      - "8081:80"
+      - "5341:5341"  # Seq ingestion port
+      - "8081:80"    # Seq web UI port
     environment:
       ACCEPT_EULA: Y
+    networks:
+      - app-network  # Add to network
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"  # Default Redis port
+    networks:
+      - app-network  # Add to network
+    command: ["redis-server", "--appendonly", "yes"]  # Persistent storage
+
+networks:
+  app-network:
+    driver: bridge
