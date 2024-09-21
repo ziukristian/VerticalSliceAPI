@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  verticalsliceapi:
+    image: ${DOCKER_REGISTRY-}verticalsliceapi
+    build:
+      context: API
+      dockerfile: Dockerfile
+    
+

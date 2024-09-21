@@ -11,5 +11,7 @@ namespace VerticalSliceAPI.Model
         {
             optionsBuilder.UseInMemoryDatabase("TestDB");
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
     }
 }

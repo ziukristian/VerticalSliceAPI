@@ -1,6 +1,7 @@
 ﻿using Carter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Swagger;
 using VerticalSliceAPI.Entities;
 using VerticalSliceAPI.Model;
 
@@ -14,7 +15,7 @@ namespace VerticalSliceAPI.Features.Users
         {
             app.MapPost(
                 "users",
-                async (AppDbContext context) =>
+                async (AppDbContext context, ISwaggerProvider provider) =>
                 {
                     User user = new() { Email = "ziukristian@gmail.com", Password = "123" };
 
