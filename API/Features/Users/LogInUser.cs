@@ -25,15 +25,17 @@ public static class LoginUser
 
             if (user == null)
             {
-                return false;
+                throw new UnauthorizedAccessException("User not found");
             }
 
-            if (BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+            var doPasswordsMatch = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
+
+            if (!doPasswordsMatch)
             {
-                return true;
+                throw new UnauthorizedAccessException("Wrong password");
             }
 
-            return false;
+            return true;
         }
     }
 }
@@ -48,7 +50,7 @@ public class LoginUserEndpoint : ICarterModule
                 {
                     var isAuthenticated = await sender.Send(request);
 
-                    return isAuthenticated ? Results.Ok() : Results.Unauthorized();
+                    return Results.Ok(isAuthenticated);
                 }
             )
             .WithTags(UserShared.Tag);

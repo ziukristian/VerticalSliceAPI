@@ -3,6 +3,7 @@ using Carter;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
 using VerticalSliceAPI.Extensions;
+using VerticalSliceAPI.Middleware;
 using VerticalSliceAPI.Model;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Progr
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
