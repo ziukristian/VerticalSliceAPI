@@ -1,6 +1,9 @@
-﻿using System.Reflection.Metadata;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata;
 using BCrypt.Net;
 using Carter;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
@@ -17,6 +20,15 @@ public static class CreateUser
     {
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+    }
+
+    public class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Email).EmailAddress();
+            RuleFor(x => x.Password).NotEmpty();
+        }
     }
 
     internal sealed class Handler(AppDbContext context, IOutputCacheStore cacheStore)
@@ -50,8 +62,19 @@ public class CreateUserEndpoint : ICarterModule
     {
         app.MapPost(
             "users",
-            async (CreateUser.Command command, ISender sender) =>
+            async (
+                CreateUser.Command command,
+                ISender sender,
+                IValidator<CreateUser.Command> validator
+            ) =>
             {
+                var validatorResult = await validator.ValidateAsync(command);
+
+                if (!validatorResult.IsValid)
+                {
+                    return Results.ValidationProblem(validatorResult.ToDictionary());
+                }
+
                 var userId = await sender.Send(command);
 
                 return Results.Ok(userId);

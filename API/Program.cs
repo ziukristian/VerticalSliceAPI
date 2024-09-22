@@ -1,5 +1,6 @@
 using System.Reflection;
 using Carter;
+using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
 using VerticalSliceAPI.Extensions;
@@ -29,6 +30,7 @@ builder.Services.AddStackExchangeRedisOutputCache(options =>
     options.InstanceName = "vertical-slice-api";
 });
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
 var app = builder.Build();
 

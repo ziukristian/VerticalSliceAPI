@@ -5,29 +5,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace VerticalSliceAPI.Middleware
 {
-    public sealed class ExceptionHandlingMiddleware
+    public sealed class ExceptionHandlingMiddleware(
+        ILogger<ExceptionHandlingMiddleware> logger,
+        RequestDelegate next
+    )
     {
-        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
-        private readonly RequestDelegate _next;
-
-        public ExceptionHandlingMiddleware(
-            ILogger<ExceptionHandlingMiddleware> logger,
-            RequestDelegate next
-        )
-        {
-            _logger = logger;
-            _next = next;
-        }
-
         public async Task InvokeAsync(HttpContext context)
         {
             try
             {
-                await _next(context);
+                await next(context);
             }
             catch (ValidationException ve)
             {
-                _logger.LogError(ve, ve.Message);
+                logger.LogError(ve, ve.Message);
 
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
@@ -51,7 +42,7 @@ namespace VerticalSliceAPI.Middleware
             }
             catch (UnauthorizedAccessException ae)
             {
-                _logger.LogError(ae, ae.Message);
+                logger.LogError(ae, ae.Message);
 
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
 
@@ -75,7 +66,7 @@ namespace VerticalSliceAPI.Middleware
             }
             catch (Exception e)
             {
-                _logger.LogError(e, e.Message);
+                logger.LogError(e, e.Message);
 
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 

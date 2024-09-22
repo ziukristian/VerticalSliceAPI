@@ -1,4 +1,5 @@
 ﻿using Carter;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,15 @@ public static class LoginUser
     {
         public required string Email { get; set; }
         public required string Password { get; set; }
+    }
+
+    public class Validator : AbstractValidator<Request>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Email).EmailAddress();
+            RuleFor(x => x.Password).NotEmpty();
+        }
     }
 
     internal sealed class Handler(AppDbContext context) : IRequestHandler<Request, bool>
@@ -46,8 +56,19 @@ public class LoginUserEndpoint : ICarterModule
     {
         app.MapPost(
                 "users/login",
-                async (ISender sender, LoginUser.Request request) =>
+                async (
+                    ISender sender,
+                    LoginUser.Request request,
+                    IValidator<LoginUser.Request> validator
+                ) =>
                 {
+                    var validationResult = await validator.ValidateAsync(request);
+
+                    if (!validationResult.IsValid)
+                    {
+                        return Results.ValidationProblem(validationResult.ToDictionary());
+                    }
+
                     var isAuthenticated = await sender.Send(request);
 
                     return Results.Ok(isAuthenticated);
