@@ -1,4 +1,5 @@
 ﻿using System.Reflection.Metadata;
+using BCrypt.Net;
 using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -23,11 +24,13 @@ public static class CreateUser
     {
         public async Task<Guid> Handle(Command request, CancellationToken cancellationToken)
         {
+            var salt = BCrypt.Net.BCrypt.GenerateSalt();
+
             var user = new User
             {
                 Id = Guid.NewGuid(),
                 Email = request.Email,
-                Password = request.Password,
+                Password = BCrypt.Net.BCrypt.HashPassword(request.Password, salt),
             };
 
             context.Users.Add(user);
